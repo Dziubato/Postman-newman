@@ -1,0 +1,491 @@
+{
+	"info": {
+		"_postman_id": "4d9f6123-38d2-4055-b2ee-007360c36d47",
+		"name": "US example",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register new user - /doregister",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(`${request.name} - status code is 200`, function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"const schema = {",
+							"    type: \"object\",",
+							"    properties: {",
+							"        name: {",
+							"            type: \"string\",",
+							"            minLength: 5,",
+							"            maxLength: 20",
+							"        },",
+							"        avatar: {",
+							"            type: \"string\"",
+							"        },",
+							"        password: {",
+							"            type: \"string\"",
+							"        },",
+							"        birthday: {",
+							"            type: \"number\"",
+							"        },",
+							"        email: {",
+							"            type: \"string\"",
+							"        },",
+							"        gender: {",
+							"            type: \"string\"",
+							"        },",
+							"        date_start: {",
+							"            type: \"number\"",
+							"        },",
+							"        hobby: {",
+							"            type: \"string\"",
+							"        }",
+							"    }, required: ['name', 'email', 'password', 'birthday', 'email', 'gender', 'date_start', 'hobby']",
+							"}",
+							"",
+							"",
+							"pm.test(`${request.name} - validate response schema`, () => {",
+							"    const result = tv4.validateMultiple(jsonData, schema, false, true);",
+							"",
+							"    if(!result.valid) result.errors.forEach(error => ",
+							"    console.log(`Validation error: ${error.message}. Path: ${error.schemaPath}, Item: ${error.dataPath}`));",
+							"  ",
+							"    pm.expect(result.valid).to.be.true;",
+							"});",
+							"",
+							"pm.test(`${request.name} - validate that name is correct`, () => {",
+							"    pm.expect(jsonData.name).to.eql(pm.environment.get('name'))",
+							"})",
+							"",
+							"",
+							"pm.test(\"Content-Type is correct\", function () {",
+							"    pm.expect(pm.response.headers.get('Content-type')).to.eql('application/json');",
+							"});",
+							"",
+							"const requestData = {",
+							"    url: pm.environment.get('url') + '/deleteuser',",
+							"    method: \"DELETE\",",
+							"    headers: {",
+							"        \"Content-type\": \"application/json\"",
+							"    },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"            \"email\": pm.environment.get('email')",
+							"        })",
+							"    }",
+							"}",
+							"",
+							"pm.sendRequest(requestData);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randValue = pm.variables.replaceIn('{{$randomPhoneNumber}}'); ",
+							"const email = `test_${randValue}@gmail.com`;",
+							"pm.environment.set(\"email\", email);",
+							"",
+							"const name = `name${randValue}`;",
+							"pm.environment.set('name', name);",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{email}}\",\n    \"name\": \"{{name}}\",\n    \"password\": \"123456789\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/doregister",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"doregister"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a user - /getuser?email={{user_email}}",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Email is correct\", function () {",
+							"    pm.expect(jsonData.email).to.eql(pm.environment.get('email'));",
+							"});",
+							"",
+							"var schema = {",
+							"    type: 'object',",
+							"    properties: {",
+							"        name: {",
+							"            type: 'string'",
+							"        },",
+							"        avatar: {",
+							"            type: 'string'",
+							"        },",
+							"        email: {",
+							"            type: 'string'",
+							"        },",
+							"        password: {",
+							"            type: 'string'",
+							"        },",
+							"        birthday: {",
+							"            type: 'number'",
+							"        },",
+							"        gender: {",
+							"            type: 'string'",
+							"        },",
+							"        date_start: {",
+							"            type: 'number'",
+							"        },",
+							"        hobby: {",
+							"            type: 'string'",
+							"        }",
+							"    }, required: ['name', 'avatar', 'email', 'password', 'birthday', 'gender', 'date_start', 'hobby']",
+							"};",
+							"",
+							"",
+							"pm.test(`${request.name} - validate response schema`, () => {",
+							"    const result = tv4.validateMultiple(jsonData, schema, false, true);",
+							"",
+							"    if(!result.valid) result.errors.forEach(error => ",
+							"    console.log(`Validation error: ${error.message}. Path: ${error.schemaPath}, Item: ${error.dataPath}`));",
+							"  ",
+							"    pm.expect(result.valid).to.be.true;",
+							"});",
+							"",
+							"const requestData = {",
+							"    url: pm.environment.get('url') + '/deleteuser',",
+							"    method: \"DELETE\",",
+							"    headers: {",
+							"        \"Content-type\": \"application/json\"",
+							"    },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"            \"email\": pm.environment.get('email')",
+							"        })",
+							"    }",
+							"}",
+							"",
+							"pm.sendRequest(requestData);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randValue = pm.variables.replaceIn('{{$randomPhoneNumber}}'); ",
+							"const email = `test_${randValue}@gmail.com`;",
+							"JSON.stringify(pm.environment.set(\"email\", email));",
+							"",
+							"const name = `name${randValue}`;",
+							"JSON.stringify(pm.environment.set('name', name));",
+							"",
+							"const password = `pass${randValue}`;",
+							"JSON.stringify(pm.environment.set('password', password));",
+							"",
+							"",
+							"",
+							"const requestData = {",
+							"    url: pm.environment.get('url')+'/doregister',",
+							"    method: \"POST\",",
+							"    header: {",
+							"        \"Content-type\": \"application/json\"",
+							"    },",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"email\": pm.environment.get('email'),",
+							"            \"password\": pm.environment.get('password'),",
+							"            \"name\": pm.environment.get('name')",
+							"        })",
+							"    }",
+							"}",
+							"pm.sendRequest(requestData);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/getuser?email={{email}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"getuser"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "{{email}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login - /dologin",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randValue = pm.variables.replaceIn('{{$randomPhoneNumber}}'); ",
+							"",
+							"const email = `test_${randValue}@gmail.com`;",
+							"JSON.stringify(pm.environment.set(\"email\", email));",
+							"",
+							"const name = `name${randValue}`;",
+							"",
+							"const password = `pass${randValue}`;",
+							"JSON.stringify(pm.environment.set(\"password\", password));",
+							"",
+							"",
+							"",
+							"const requestData = {",
+							"    url: pm.environment.get('url')+'/doregister',",
+							"    method: \"POST\",",
+							"    header: {",
+							"        \"Content-type\": \"application/json\"",
+							"    },",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"email\": email,",
+							"            \"password\": password,",
+							"            \"name\": name",
+							"        })",
+							"    }",
+							"}",
+							"pm.sendRequest(requestData);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(`${request.name} - status code is 200`, function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"const jsonData = pm.response.json();",
+							"",
+							"const schema = {",
+							"    type: 'object',",
+							"    properties: {",
+							"        result: {",
+							"            type: 'boolean'",
+							"        }",
+							"    }, required: ['result']",
+							"}",
+							"",
+							"pm.test(`${request.name} - validate response schema`, () => {",
+							"    const result = tv4.validateMultiple(jsonData, schema, false, true);",
+							"",
+							"    if(!result.valid) result.errors.forEach(error => ",
+							"    console.log(`Validation error: ${error.message}. Path: ${error.schemaPath}, Item: ${error.dataPath}`));",
+							"  ",
+							"    pm.expect(result.valid).to.be.true;",
+							"});",
+							"",
+							"",
+							"pm.test(`${request.name} - result is true`, function () {",
+							"    pm.expect(JSON.stringify(jsonData.result)).to.eql(\"true\");",
+							"})",
+							"",
+							"const requestData = {",
+							"    url: pm.environment.get('url') + '/deleteuser',",
+							"    method: \"DELETE\",",
+							"    headers: {",
+							"        \"Content-type\": \"application/json\"",
+							"    },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"            \"email\": pm.environment.get('email')",
+							"        })",
+							"    }",
+							"}",
+							"",
+							"pm.sendRequest(requestData);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/dologin",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"dologin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete user - /deleteuser",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randValue = pm.variables.replaceIn('{{$randomPhoneNumber}}'); ",
+							"const email = `test_${randValue}@gmail.com`;",
+							"pm.environment.set(\"email\", email);",
+							"",
+							"const name = `name${randValue}`;",
+							"pm.environment.set('name', name);",
+							"",
+							"const password = `pass${randValue}`;",
+							"pm.environment.set('password', password);",
+							"",
+							"",
+							"",
+							"const requestData = {",
+							"    url: pm.environment.get('url')+'/doregister',",
+							"    method: \"POST\",",
+							"    header: {",
+							"        \"Content-type\": \"application/json\"",
+							"    },",
+							"    body: {",
+							"        mode: \"raw\",",
+							"        raw: JSON.stringify({",
+							"            \"email\": pm.environment.get('email'),",
+							"            \"password\": pm.environment.get('password'),",
+							"            \"name\": pm.environment.get('name')",
+							"        })",
+							"    }",
+							"}",
+							"",
+							"pm.sendRequest(requestData, (err,res) => {",
+							"    //цей код тут для того, щоб продемонструвати, як зберігати дані з запиту в Pre-Request-і",
+							"    const jsonData = res.json();",
+							"    const emailToDelete = jsonData.email;",
+							"    pm.environment.set('emailToDelete', emailToDelete);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							" const responseData = pm.response.text();",
+							"",
+							"pm.test(`${request.name} - status code is 200`, function () {",
+							"    pm.response.to.have.status(200);",
+							"}),",
+							"",
+							"pm.test(`${request.name} - user was deleted`, function () {",
+							"    pm.expect(responseData).contain(pm.environment.get('email'));",
+							"});",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json; charset=UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{emailToDelete}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/deleteuser",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"deleteuser"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
